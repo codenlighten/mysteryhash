@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- meta  -->
+    <!-- favicon question.png-->
+    <link rel="icon" href="question.png" />
+    <meta name="description" content="Mystery Hash" />
+    <meta name="keywords" content="Mystery Hash" />
+    <meta name="author" content="Mystery Hash" />
+    <twitter card="summary" />
+    <meta property="og:title" content="Mystery Hash" />
+    <meta property="og:description" content="Mystery Hash" />
+    <meta property="og:image" content="question.png" />
+    <meta property="og:url" content="https://hashguess.com" />
+    <meta property="og:site_name" content="Mystery Hash" />
+    <meta property="og:type" content="website" />
+    <script src="https://unpkg.com/bsv@1.5"></script>
+    <title>Mystery Hash</title>
+    <style>
+      body {
+        background-color: #f5f5f5;
+        font-family: sans-serif;
+        text-align: center;
+      }
+      h1 {
+        color: #333;
+      }
+      img {
+        width: 200px;
+        height: 200px;
+      }
+      input {
+        width: 100px;
+        height: 30px;
+        border: 1px solid #333;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 16px;
+      }
+      button {
+        width: 100px;
+        height: 30px;
+        border: 1px solid #333;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 16px;
+        background-color: #333;
+        color: #fff;
+      }
+      p {
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mystery Hash</h1>
+    <img src="question.png" alt="" />
+    <p>Guess the hash of a random number</p>
+    <p>Enter a number between 0 and 1000</p>
+    <input type="text" id="guess" />
+    <button id="submit">Submit</button>
+    <p id="randomNumber"></p>
+    <p id="result"></p>
+    <script>
+      const Buffer = bsv.deps.Buffer;
+      const submit = document.getElementById("submit");
+      let guess = document.getElementById("guess");
+      let result = document.getElementById("result");
+      let interval;
+      let randonNumber;
+      submit.addEventListener("click", () => {
+        let i = 0;
+        interval = setInterval(() => {
+          randonNumber = Math.floor(Math.random() * 1000);
+          document.getElementById("randomNumber").innerHTML = randonNumber;
+          i++;
+          if (i === 100) {
+            clearInterval(interval);
+            const hash = bsv.crypto.Hash.sha256(
+              Buffer.from(randonNumber.toString())
+            ).toString("hex");
+            if (hash === guess.value) {
+              result.innerHTML = `You guessed the hash of ${randonNumber} correctly! Your guess was ${guess.value}`;
+            } else {
+              result.innerHTML = `You guessed the hash of ${randonNumber} incorrectly! Your guess was ${guess.value}`;
+            }
+          }
+        }, 10);
+      });
+    </script>
+  </body>
+</html>
