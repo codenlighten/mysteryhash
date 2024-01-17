@@ -23,6 +23,7 @@
         background-color: #f5f5f5;
         font-family: sans-serif;
         text-align: center;
+        word-wrap: break-word;
       }
       h1 {
         color: #333;
@@ -52,12 +53,23 @@
       p {
         color: #333;
       }
+      #randomNumber {
+        font-size: 20px;
+        color: #333;
+      }
+      #result {
+        font-size: 20px;
+        color: #333;
+      }
     </style>
   </head>
   <body>
     <h1>Mystery Hash</h1>
     <img src="question.png" alt="" />
-    <p>Guess the hash of a random number</p>
+    <p>
+      Guess a random number AND check the hash of the number to see if you
+      guessed correctly!
+    </p>
     <p>Enter a number between 0 and 1000</p>
     <input type="text" id="guess" />
     <button id="submit">Submit</button>
@@ -69,24 +81,50 @@
       let guess = document.getElementById("guess");
       let result = document.getElementById("result");
       let interval;
-      let randonNumber;
+      let randomNumber;
+      const randomPlaceholder = Math.floor(Math.random() * 1000);
+      guess.value = randomPlaceholder;
       submit.addEventListener("click", () => {
+        result.innerHTML = "";
         let i = 0;
+        const guessValue = guess.value;
         interval = setInterval(() => {
-          randonNumber = Math.floor(Math.random() * 1000);
-          document.getElementById("randomNumber").innerHTML = randonNumber;
-          let hash = bsv.crypto.Hash.sha256(
-            Buffer.from(randonNumber.toString())
-          ).toString("hex");
+          randomNumber = Math.floor(Math.random() * 1000);
+          document.getElementById("randomNumber").innerHTML = randomNumber;
+          document.getElementById("randomNumber").style.fontSize = "30px";
           i++;
           if (i === 100) {
             clearInterval(interval);
-
-            if (hash === guess.value) {
-              result.innerHTML = `You guessed the hash of ${randonNumber} correctly! Your guess was ${guess.value}`;
-            } else {
-              result.innerHTML = `You guessed the hash of ${randonNumber} incorrectly! Your guess was ${guess.value}`;
-            }
+            const hash = bsv.crypto.Hash.sha256(
+              Buffer.from(randomNumber.toString())
+            ).toString("hex");
+            document.getElementById("randomNumber").innerHTML = "";
+            document.getElementById("randomNumber").style.fontSize = "20px";
+            document.getElementById(
+              "randomNumber"
+            ).innerHTML = `Random Number: <span id="randomGuessHash">***************</span></br><span >${hash}</span></br>Click the hash to reveal the number!`;
+            result.innerHTML = `You guessed ${guess.value}.`;
+            result.style.color = "#333";
+            const userHash = bsv.crypto.Hash.sha256(
+              Buffer.from(guessValue.toString())
+            ).toString("hex");
+            document
+              .getElementById("randomNumber")
+              .addEventListener("click", () => {
+                document.getElementById("randomGuessHash").style.fontSize =
+                  "20px";
+                document.getElementById("randomGuessHash").innerHTML =
+                  randomNumber;
+                if (guess.value == randomNumber) {
+                  result.innerHTML = `You guessed ${guessValue} correctly!</br>${userHash}</br> Congratulations!`;
+                  result.style.color = "green";
+                } else {
+                  result.innerHTML = `You guessed ${guessValue} incorrectly!</br>${userHash}</br> Try again!`;
+                  result.style.color = "red";
+                  const newRandomPlaceholder = Math.floor(Math.random() * 1000);
+                  guess.value = newRandomPlaceholder;
+                }
+              });
           }
         }, 10);
       });
