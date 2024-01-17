@@ -75,12 +75,13 @@
         interval = setInterval(() => {
           randonNumber = Math.floor(Math.random() * 1000);
           document.getElementById("randomNumber").innerHTML = randonNumber;
+          let hash = bsv.crypto.Hash.sha256(
+            Buffer.from(randonNumber.toString())
+          ).toString("hex");
           i++;
           if (i === 100) {
             clearInterval(interval);
-            const hash = bsv.crypto.Hash.sha256(
-              Buffer.from(randonNumber.toString())
-            ).toString("hex");
+
             if (hash === guess.value) {
               result.innerHTML = `You guessed the hash of ${randonNumber} correctly! Your guess was ${guess.value}`;
             } else {
